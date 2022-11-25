@@ -8,23 +8,27 @@ int n, m;
 struct segtree {
 	int l, r, c[2];
 	long long sum, add;
-} a[2000005];
+} a[8000005];
 int cnt = 1;
 
 void make(int k) {
 	int l = a[k].l, r = a[k].r;
 	int mid = l + r >> 1;
-	if (!ls(k)) ls(k) = ++cnt;
-	a[ls(k)].l = l, a[ls(k)].r = mid;
-	a[ls(k)].sum = a[ls(k)].add = 0;
-	if (!rs(k)) rs(k) = ++cnt;
-	a[rs(k)].l = mid + 1, a[rs(k)].r = r;
-	a[rs(k)].sum = a[rs(k)].add = 0;
+	if (!ls(k)) {
+		ls(k) = ++cnt;
+		a[ls(k)].l = l, a[ls(k)].r = mid;
+		a[ls(k)].sum = a[ls(k)].add = 0;
+	}
+	if (!rs(k)) {
+		rs(k) = ++cnt;
+		a[rs(k)].l = mid + 1, a[rs(k)].r = r;
+		a[rs(k)].sum = a[rs(k)].add = 0;
+	}
 	return;
 }
 
 void pushdown(int k) {
-	if (!a[k].add) return;
+//	if (!a[k].add) return;
 	if (1ll * ls(k) * rs(k) == 0) make(k);
 	a[ls(k)].add += a[k].add;
 	a[ls(k)].sum += a[k].add * (a[ls(k)].r - a[ls(k)].l + 1);
@@ -41,10 +45,11 @@ void update(int k) {
 
 void add(int k, int l, int r, int val) {
 	if (a[k].l == l && a[k].r == r) {
-		a[k].add += val;
-		a[k].sum += val * (r - l + 1);
+		a[k].add += 1ll * val;
+		a[k].sum += 1ll * val * (r - l + 1);
 		return;
 	}
+//	if (1ll * ls(k) * rs(k) == 0) make(k);
 	pushdown(k);
 	int mid = a[k].l + a[k].r >> 1;
 	if (r <= mid) add(ls(k), l, r, val);
@@ -60,6 +65,7 @@ void add(int k, int l, int r, int val) {
 long long query(int k, int l, int r) {
 	if (a[k].l == l && a[k].r == r)
 		return a[k].sum;
+//	if (1ll * ls(k) * rs(k) == 0) make(k);
 	pushdown(k);
 	int mid = a[k].l + a[k].r >> 1;
 	if (r <= mid) return query(ls(k), l, r);
